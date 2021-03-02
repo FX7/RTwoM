@@ -1,0 +1,5 @@
+name: Rest2Minecraft
+main: fx7.r2m.RestTwoItemPlugin
+version: 0.1
+api-version: 1.13
+commands:
