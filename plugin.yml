@@ -1,5 +1,5 @@
 name: Rest2Minecraft
-main: fx7.r2m.RestTwoItemPlugin
+main: fx7.r2m.RestTwoMinecraftPlugin
 version: 0.1
 api-version: 1.13
 commands:
