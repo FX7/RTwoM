@@ -1,9 +1,7 @@
 package fx7.r2m.rest.parameter.location;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 
@@ -11,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.World.Environment;
 
 import fx7.r2m.access.EntityAccess;
 import fx7.r2m.rest.RestException;
@@ -21,6 +20,7 @@ import net.querz.nbt.io.NamedTag;
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.DoubleTag;
 import net.querz.nbt.tag.ListTag;
+import net.querz.nbt.tag.Tag;
 
 public class LocationParameter implements RestParameter, MinecraftParameter<Location>
 {
@@ -60,9 +60,56 @@ public class LocationParameter implements RestParameter, MinecraftParameter<Loca
 
 	public static Location getLocationFromOfflinePlayer(OfflinePlayer player)
 	{
+		try
+		{
+			NamedTag playerFile = getPlayerDats(player);
+			if (playerFile == null)
+				return null;
+
+			// TODO Exception
+			CompoundTag tag = (CompoundTag) playerFile.getTag();
+			World world = getWorldFromDimensionTag((Tag<String>) tag.get("Dimension"));
+			ListTag<DoubleTag> pos = (ListTag<DoubleTag>) tag.get("Pos");
+			double x = pos.get(0).asDouble();
+			double y = pos.get(1).asDouble();
+			double z = pos.get(2).asDouble();
+			return new Location(world, x, y, z);
+		} catch (Exception e)
+		{
+		}
+
+		return null;
+	}
+
+	private static World getWorldFromDimensionTag(Tag<String> dimension)
+	{
+		// TODO ob das so stimmt ...
+		Environment env = null;
+		String[] dimensionSplit = dimension.valueToString().replaceAll("\"", "").split(":");
+		if ("overworld".equals(dimensionSplit[1]))
+			env = Environment.NORMAL;
+		else if (Environment.NETHER.name().toLowerCase().equals(dimensionSplit[1]))
+			env = Environment.NETHER;
+		else if (Environment.THE_END.name().toLowerCase().equals(dimensionSplit[1]))
+			env = Environment.THE_END;
+
+		// no environment from dimension => its the name of the world!
+		if (env == null)
+			Bukkit.getWorld(dimensionSplit[1]);
+
+		for (World world : Bukkit.getWorlds())
+		{
+			if (world.getEnvironment() == env)
+				return world;
+		}
+
+		return null;
+	}
+
+	private static NamedTag getPlayerDats(OfflinePlayer player) throws IOException
+	{
 		UUID uuid = player.getUniqueId();
 
-		Map<World, File> worldPlayerFile = new HashMap<>();
 		for (World w : Bukkit.getWorlds())
 		{
 			File[] playerFiles = null;
@@ -72,27 +119,7 @@ public class LocationParameter implements RestParameter, MinecraftParameter<Loca
 				playerFiles = playerDataFolder[0]
 						.listFiles((p) -> p.isFile() && p.getName().equals(uuid.toString() + ".dat"));
 			if (playerFiles != null && playerFiles.length == 1)
-				worldPlayerFile.put(w, playerFiles[0]);
-		}
-
-		// TODO MultiWorld / Nether / End ?
-		// TODO Exception
-		for (Entry<World, File> entry : worldPlayerFile.entrySet())
-		{
-			try
-			{
-				World world = entry.getKey();
-				File file = entry.getValue();
-				NamedTag root = NBTUtil.read(file);
-				CompoundTag tag = (CompoundTag) root.getTag();
-				ListTag<DoubleTag> pos = (ListTag<DoubleTag>) tag.get("Pos");
-				double x = pos.get(0).asDouble();
-				double y = pos.get(1).asDouble();
-				double z = pos.get(2).asDouble();
-				return new Location(world, x, y, z);
-			} catch (Exception e)
-			{
-			}
+				return NBTUtil.read(playerFiles[0]);
 		}
 
 		return null;
