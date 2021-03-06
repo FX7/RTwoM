@@ -38,7 +38,6 @@ public class RestTwoMinecraftPlugin extends JavaPlugin implements Coordinator
 	private static final String STORE_KEY_SCRIPTS = "scripts";
 	private List<ScriptEntity> scripts;
 
-	private AccessManager accessManager;
 	private ScriptManager scriptManager;
 	private RestServer restServer;
 
@@ -54,7 +53,7 @@ public class RestTwoMinecraftPlugin extends JavaPlugin implements Coordinator
 
 	private void storeConfigs()
 	{
-		getConfig().set(STORE_KEY_APP_ACCESS, this.accessManager.getAppAccesss());
+		getConfig().set(STORE_KEY_APP_ACCESS, AccessManager.getInstance().getAppAccesss());
 		getConfig().set(STORE_KEY_REST_SERVER_CONFIG, this.restServer.getConfig());
 		getScriptsConfigFile().set(STORE_KEY_SCRIPTS, this.scriptManager.getScripts());
 		try
@@ -70,8 +69,7 @@ public class RestTwoMinecraftPlugin extends JavaPlugin implements Coordinator
 	@Override
 	public void onEnable()
 	{
-		if (this.accessManager == null)
-			this.accessManager = new AccessManager(this.getAppAccesss());
+		AccessManager.initInstance(getAppAccesss());
 		if (this.scriptManager == null)
 			this.scriptManager = new ScriptManager(this.getScripts());
 		if (this.restServer == null)
@@ -155,12 +153,6 @@ public class RestTwoMinecraftPlugin extends JavaPlugin implements Coordinator
 			customConfig = YamlConfiguration.loadConfiguration(customConfigFile);
 		}
 		return customConfig;
-	}
-
-	@Override
-	public AccessManager getAccessManager()
-	{
-		return accessManager;
 	}
 
 	@Override

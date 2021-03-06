@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 
-import fx7.r2m.access.AppAccess;
 import fx7.r2m.access.Context;
 import fx7.r2m.access.EntityAccess;
 import fx7.r2m.entity.script.ScriptEntity;
@@ -24,17 +23,12 @@ import fx7.r2m.rest.parameter.ParametersProvider;
 import fx7.r2m.rest.parameter.ParametersReceiver;
 import fx7.r2m.rest.parameter.itemstack.ItemStackParameterProvider;
 import fx7.r2m.rest.parameter.location.LocationParameterProvider;
-import fx7.r2m.rest.parameter.location.LocationParameterReceiver;
 import fx7.r2m.rest.parameter.material.MaterialParameterProvider;
 import fx7.r2m.rest.parameter.player.PlayerParameterProvider;
-import fx7.r2m.rest.parameter.player.PlayerParameterReceiver;
 import fx7.r2m.rest.server.RequestMethod;
 
 public class ExecuteAction extends RestAction implements ParametersProvider, ParametersReceiver
 {
-	private List<EntityAccess> access;
-	private AppAccess appAccess;
-
 	private ScriptEntity script;
 
 	private ParameterList<ItemStack> itemStackParameters = new ParameterList<>();
@@ -56,10 +50,8 @@ public class ExecuteAction extends RestAction implements ParametersProvider, Par
 		Map<String, RestJsonReturnable> resultMap = new HashMap<>();
 		for (RestAction ra : script.getRestActions())
 		{
-			checkAccess(ra);
 			ParametersProvider.setParameters(ra, this);
-			// check access
-			ra.setCoordinator(coordinator);
+			ra.init(coordinator, entityAccess);
 			RestReturnable result = ra.excecute();
 			if (!result.success())
 				throw RestException.fromAnyRestReturnable(result);
@@ -71,43 +63,16 @@ public class ExecuteAction extends RestAction implements ParametersProvider, Par
 		return new ExecutionResult(resultMap); // list -> single action
 	}
 
-	private void checkAccess(RestAction action) throws RestException
-	{
-		if (action instanceof LocationParameterReceiver)
-		{
-			Context context = Context.WORLD;
-			Location location = peekLocation();
-			String entityName = location.getWorld().getName();
-
-			EntityAccess access = getEntityAccess(context, entityName);
-			appAccess.checkAccess(access);
-		}
-		if (action instanceof PlayerParameterReceiver)
-		{
-			Context context = Context.PLAYER;
-			OfflinePlayer player = peekPlayer();
-			String entityName = player.getName();
-
-			EntityAccess access = getEntityAccess(context, entityName);
-			appAccess.checkAccess(access);
-		}
-	}
-
-	private EntityAccess getEntityAccess(Context context, String entityName) throws RestException
-	{
-		Optional<EntityAccess> entityAccess = access.stream()
-				.filter(a -> a.getContext() == context && a.getEntityName().equals(entityName)).findFirst();
-		if (!entityAccess.isPresent())
-			throw RestException.noEntityAccess(entityName, context);
-
-		return entityAccess.get();
-	}
-
-	public void init(ScriptEntity script, AppAccess appAccess, List<EntityAccess> access)
+	public void init(ScriptEntity script, Set<EntityAccess> entityAccess)
 	{
 		this.script = script;
-		this.appAccess = appAccess;
-		this.access = access;
+		this.entityAccess = entityAccess;
+	}
+
+	@Override
+	public Set<EntityAccess> getEntityAccess()
+	{
+		return entityAccess;
 	}
 
 	@Override
@@ -203,7 +168,6 @@ public class ExecuteAction extends RestAction implements ParametersProvider, Par
 	{
 		this.materialParameters.addParameters(new ParameterProvider<Material>()
 		{
-
 			@Override
 			public boolean hasMore()
 			{
@@ -300,7 +264,7 @@ public class ExecuteAction extends RestAction implements ParametersProvider, Par
 					this.parameters.add(provider.consume());
 				} catch (RestException e)
 				{
-					// Exception Handling
+					// TODO Exception Handling
 				}
 			}
 			index = this.parameters.size() - 1;

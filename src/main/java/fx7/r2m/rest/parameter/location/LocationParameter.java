@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -11,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 
+import fx7.r2m.access.EntityAccess;
 import fx7.r2m.rest.RestException;
 import fx7.r2m.rest.parameter.MinecraftParameter;
 import fx7.r2m.rest.parameter.RestParameter;
@@ -36,9 +38,9 @@ public class LocationParameter implements RestParameter, MinecraftParameter<Loca
 	}
 
 	@Override
-	public Location toMinecraftParameter() throws RestException
+	public Location toMinecraftParameter(Set<EntityAccess> entityAccess) throws RestException
 	{
-		return LocationParameterProvider.fromParameters(world, x, y, z);
+		return LocationParameterProvider.fromParameters(entityAccess, world, x, y, z);
 	}
 
 	@Override

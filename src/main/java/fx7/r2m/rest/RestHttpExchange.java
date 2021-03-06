@@ -1,6 +1,7 @@
 package fx7.r2m.rest;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -9,10 +10,8 @@ import org.bukkit.inventory.ItemStack;
 
 import com.sun.net.httpserver.HttpExchange;
 
-import fx7.r2m.access.AppAccess;
 import fx7.r2m.access.Context;
 import fx7.r2m.access.EntityAccess;
-import fx7.r2m.entity.script.ScriptManager;
 import fx7.r2m.rest.parameter.ParametersProvider;
 import fx7.r2m.rest.parameter.request.RequestGetParameters;
 import fx7.r2m.rest.parameter.request.RequestPostParameters;
@@ -20,32 +19,25 @@ import fx7.r2m.rest.server.RequestMethod;
 
 public class RestHttpExchange implements ParametersProvider
 {
-	protected final HttpExchange httpExchange;
-	private final AppAccess appAccess;
-	private final ScriptManager scriptManager;
+	private final HttpExchange httpExchange;
 	private final Context context;
+	private final Set<EntityAccess> entityAccess = new HashSet<>();
 
 	private RequestGetParameters getParameters;
 	private RequestPostParameters postParameters;
 	private RequestMethod requestMethod;
 
-	public RestHttpExchange(HttpExchange httpExchange, AppAccess appAccess, ScriptManager scriptManager,
-			Context context)
+	public RestHttpExchange(HttpExchange httpExchange, Context context, Set<EntityAccess> entityAccess)
 	{
 		this.httpExchange = httpExchange;
-		this.appAccess = appAccess;
-		this.scriptManager = scriptManager;
 		this.context = context;
+		if (entityAccess != null)
+			this.entityAccess.addAll(entityAccess);
 	}
 
-	public AppAccess getAppAccess()
+	public Set<EntityAccess> getEntityAccess()
 	{
-		return appAccess;
-	}
-
-	public ScriptManager getScriptManager()
-	{
-		return scriptManager;
+		return entityAccess;
 	}
 
 	@Override
@@ -102,7 +94,7 @@ public class RestHttpExchange implements ParametersProvider
 	public OfflinePlayer peekPlayer() throws RestException
 	{
 		if (getGetParameters().hasMorePlayer())
-			getGetParameters().peekPlayer();
+			return getGetParameters().peekPlayer();
 		return getPostParameters().peekPlayer();
 	}
 
@@ -136,17 +128,12 @@ public class RestHttpExchange implements ParametersProvider
 		return getPostParameters().consumeLocation();
 	}
 
-	public List<EntityAccess> getEntityAccess() throws RestException
-	{
-		return getPostParameters().getEntityAccess();
-	}
-
 	private RequestGetParameters getGetParameters()
 	{
 		if (getParameters != null)
 			return getParameters;
 
-		getParameters = RequestGetParameters.fromURI(context, getEntityId(), httpExchange);
+		getParameters = RequestGetParameters.fromURI(entityAccess, context, getEntityId(), httpExchange);
 		return getParameters;
 	}
 
@@ -201,7 +188,7 @@ public class RestHttpExchange implements ParametersProvider
 		if (this.postParameters != null)
 			return this.postParameters;
 
-		postParameters = RequestPostParameters.fromData(httpExchange);
+		postParameters = RequestPostParameters.fromData(entityAccess, httpExchange);
 		return postParameters;
 	}
 }

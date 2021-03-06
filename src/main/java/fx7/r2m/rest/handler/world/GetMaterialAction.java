@@ -78,7 +78,7 @@ public class GetMaterialAction extends RestAction implements LocationParameterRe
 		if (locationParameter == null)
 			throw RestException.invalidParameter("LocationParameter missing.");
 
-		Location location = locationParameter.consumeLocation();
+		Location location = locationParameter.peekLocation();
 		Material material = location.getBlock().getType();
 		this.material = material;
 		return material;

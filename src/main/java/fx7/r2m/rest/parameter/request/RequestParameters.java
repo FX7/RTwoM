@@ -1,10 +1,20 @@
 package fx7.r2m.rest.parameter.request;
 
+import java.util.Set;
+
+import fx7.r2m.access.EntityAccess;
 import fx7.r2m.rest.RestException;
 import fx7.r2m.rest.parameter.ParametersProvider;
 
 public abstract class RequestParameters implements ParametersProvider
 {
+	protected final Set<EntityAccess> entityAccess;
+
+	RequestParameters(Set<EntityAccess> entityAccess)
+	{
+		this.entityAccess = entityAccess;
+	}
+
 	protected double asDouble(String parameter) throws RestException
 	{
 		try

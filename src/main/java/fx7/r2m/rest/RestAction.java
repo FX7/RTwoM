@@ -1,7 +1,10 @@
 package fx7.r2m.rest;
 
+import java.util.Set;
+
 import fx7.r2m.Coordinator;
 import fx7.r2m.access.Context;
+import fx7.r2m.access.EntityAccess;
 import fx7.r2m.rest.server.RequestMethod;
 
 public abstract class RestAction
@@ -11,6 +14,7 @@ public abstract class RestAction
 	private final String actionName;
 
 	protected Coordinator coordinator;
+	protected Set<EntityAccess> entityAccess;
 
 	protected RestAction(Context context, RequestMethod method, String actionName)
 	{
@@ -19,24 +23,30 @@ public abstract class RestAction
 		this.actionName = actionName;
 	}
 
-	public void setCoordinator(Coordinator coordinator)
+	public void init(Coordinator coordinator, Set<EntityAccess> entityAccess)
 	{
 		this.coordinator = coordinator;
+		this.entityAccess = entityAccess;
 	}
 
-	public Context getContext()
+	public final Context getContext()
 	{
 		return context;
 	}
 
-	public RequestMethod getValidMethod()
+	public final RequestMethod getValidMethod()
 	{
 		return method;
 	}
 
-	public String getActionName()
+	public final String getActionName()
 	{
 		return actionName;
+	}
+
+	public Set<EntityAccess> getEntityAccess()
+	{
+		return entityAccess;
 	}
 
 	public abstract RestReturnable excecute() throws RestException;

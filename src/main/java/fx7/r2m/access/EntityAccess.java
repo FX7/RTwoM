@@ -17,14 +17,10 @@ public class EntityAccess implements ConfigurationSerializable, RestParameter
 	private static final String PARAM_ENTITY_NAME = "entityName";
 	private String entityName;
 
-	private static final String PARAM_ACCESS_KEY = "accessKey";
-	private String accessKey;
-
-	EntityAccess(Context context, String entityName, String accessKey)
+	public EntityAccess(Context context, String entityName)
 	{
 		this.context = context;
 		this.entityName = entityName;
-		this.accessKey = accessKey;
 	}
 
 	public Context getContext()
@@ -37,11 +33,6 @@ public class EntityAccess implements ConfigurationSerializable, RestParameter
 		return entityName;
 	}
 
-	public String getAccessKey()
-	{
-		return accessKey;
-	}
-
 	@Override
 	public Map<String, Object> serialize()
 	{
@@ -49,7 +40,6 @@ public class EntityAccess implements ConfigurationSerializable, RestParameter
 
 		serialized.put(PARAM_CONTEXT, getContext().name());
 		serialized.put(PARAM_ENTITY_NAME, getEntityName());
-		serialized.put(PARAM_ACCESS_KEY, getAccessKey());
 
 		return serialized;
 	}
@@ -58,8 +48,7 @@ public class EntityAccess implements ConfigurationSerializable, RestParameter
 	{
 		return new EntityAccess(//
 				Context.fromString((String) serialized.get(PARAM_CONTEXT)), //
-				(String) serialized.get(PARAM_ENTITY_NAME), //
-				(String) serialized.get(PARAM_ACCESS_KEY));
+				(String) serialized.get(PARAM_ENTITY_NAME));
 	}
 
 	@Override
@@ -67,7 +56,6 @@ public class EntityAccess implements ConfigurationSerializable, RestParameter
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((accessKey == null) ? 0 : accessKey.hashCode());
 		result = prime * result + ((context == null) ? 0 : context.hashCode());
 		result = prime * result + ((entityName == null) ? 0 : entityName.hashCode());
 		return result;
@@ -83,12 +71,6 @@ public class EntityAccess implements ConfigurationSerializable, RestParameter
 		if (getClass() != obj.getClass())
 			return false;
 		EntityAccess other = (EntityAccess) obj;
-		if (accessKey == null)
-		{
-			if (other.accessKey != null)
-				return false;
-		} else if (!accessKey.equals(other.accessKey))
-			return false;
 		if (context != other.context)
 			return false;
 		if (entityName == null)
@@ -103,6 +85,6 @@ public class EntityAccess implements ConfigurationSerializable, RestParameter
 	@Override
 	public String toString()
 	{
-		return "EntityAccess [context=" + context + ", entityName=" + entityName + ", accessKey=*****]";
+		return "EntityAccess [context=" + context + ", entityName=" + entityName + "]";
 	}
 }

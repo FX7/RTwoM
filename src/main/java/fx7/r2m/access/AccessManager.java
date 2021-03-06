@@ -6,14 +6,26 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import fx7.r2m.rest.RestException;
+import java.util.Optional;
+import java.util.Set;
 
 public class AccessManager
 {
 	private Map<String, AppAccess> appKeyToAppAccess;
 
-	public AccessManager(List<AppAccess> access)
+	private static AccessManager accessManager;
+
+	public static AccessManager getInstance()
+	{
+		return accessManager;
+	}
+
+	public static void initInstance(List<AppAccess> access)
+	{
+		AccessManager.accessManager = new AccessManager(access);
+	}
+
+	private AccessManager(List<AppAccess> access)
 	{
 		this.appKeyToAppAccess = initAccessMap(access);
 	}
@@ -31,17 +43,17 @@ public class AccessManager
 		return appKeyToAppAccess;
 	}
 
-	public AppAccess getAccess(String appName, String appKey) throws RestException
+	public AppAccess getAccess(String appName, String appKey)
 	{
 		if (appName == null || appName.isEmpty())
-			throw RestException.noAppAccess();
+			return null;
 
 		if (appKey == null || appKey.isEmpty())
-			throw RestException.noAppAccess();
+			return null;
 
 		AppAccess appAccess = appKeyToAppAccess.get(appKey);
 		if (appAccess == null || !appAccess.getAppName().equals(appName))
-			throw RestException.noAppAccess();
+			return null;
 
 		return appAccess;
 	}
@@ -57,4 +69,17 @@ public class AccessManager
 		return access;
 	}
 
+	public boolean hasAccess(Set<EntityAccess> accesses, Context context, String entityName)
+	{
+		if (accesses == null)
+			return false;
+
+		if (entityName == null || entityName.isEmpty())
+			return false;
+
+		Optional<EntityAccess> access = accesses.stream()
+				.filter(e -> e.getContext() == context && e.getEntityName().equals(entityName)).findFirst();
+
+		return access.isPresent();
+	}
 }

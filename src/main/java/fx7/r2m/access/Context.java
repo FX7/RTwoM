@@ -11,14 +11,14 @@ public enum Context
 		return name().toLowerCase();
 	}
 
-	public static Context fromString(String entity)
+	public static Context fromString(String context)
 	{
-		if (entity == null)
+		if (context == null)
 			return null;
 
 		try
 		{
-			return Context.valueOf(entity);
+			return Context.valueOf(context);
 		} catch (IllegalArgumentException e)
 		{
 			return null;

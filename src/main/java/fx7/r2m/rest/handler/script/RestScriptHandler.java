@@ -30,8 +30,8 @@ public class RestScriptHandler extends AbstractEntityRestHandler<ScriptEntity>
 		if (action instanceof ExecuteAction)
 		{
 			ExecuteAction ea = (ExecuteAction) action;
-			ScriptEntity script = exchange.getScriptManager().getScript(exchange.getEntityId());
-			ea.init(script, exchange.getAppAccess(), exchange.getEntityAccess());
+			ScriptEntity script = coordinator.getScriptManager().getScript(exchange.getEntityId());
+			ea.init(script, exchange.getEntityAccess());
 		}
 		return action;
 	}

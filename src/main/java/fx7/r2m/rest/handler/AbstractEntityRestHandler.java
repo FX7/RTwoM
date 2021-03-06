@@ -7,6 +7,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import fx7.r2m.Coordinator;
+import fx7.r2m.access.AccessManager;
 import fx7.r2m.access.AppAccess;
 import fx7.r2m.access.Context;
 import fx7.r2m.rest.RestAction;
@@ -19,7 +20,6 @@ public abstract class AbstractEntityRestHandler<En> implements HttpHandler
 {
 	public static final String HEAD_APP_NAME = "App-Name";
 	public static final String HEAD_APP_KEY = "App-Key";
-	public static final String HEAD_ENTITY_KEY = "Entity-Key";
 
 	protected final Coordinator coordinator;
 
@@ -35,9 +35,9 @@ public abstract class AbstractEntityRestHandler<En> implements HttpHandler
 	{
 		try
 		{
-			RestHttpExchange restExchange = checkAccess(httpExchange);
+			RestHttpExchange restExchange = checkContextAccess(httpExchange);
 			RestAction action = getAction(restExchange);
-			action.setCoordinator(coordinator);
+			action.init(coordinator, restExchange.getEntityAccess());
 			if (action.getValidMethod() != restExchange.getRequestMethod())
 				throw RestException.invalidMethod(httpExchange.getRequestMethod(), getContext(),
 						restExchange.getEntityAction());
@@ -53,19 +53,18 @@ public abstract class AbstractEntityRestHandler<En> implements HttpHandler
 		}
 	}
 
-	private RestHttpExchange checkAccess(HttpExchange httpExchange) throws RestException
+	private RestHttpExchange checkContextAccess(HttpExchange httpExchange) throws RestException
 	{
 		Headers headers = httpExchange.getRequestHeaders();
 
 		String appName = headers.getFirst(HEAD_APP_NAME);
 		String appKey = headers.getFirst(HEAD_APP_KEY);
-		String entityKey = headers.getFirst(HEAD_ENTITY_KEY);
 
-		AppAccess appAccess = coordinator.getAccessManager().getAccess(appName, appKey);
+		AppAccess appAccess = AccessManager.getInstance().getAccess(appName, appKey);
+		if (appAccess == null)
+			throw RestException.noAppAccess();
 
-		RestHttpExchange restExchange = new RestHttpExchange(httpExchange, appAccess, coordinator.getScriptManager(),
-				getContext());
-		appAccess.checkAccess(getContext(), restExchange.getEntityId(), entityKey);
+		RestHttpExchange restExchange = new RestHttpExchange(httpExchange, getContext(), appAccess.getEntityAccess());
 
 		coordinator.sendConsoleMessage(
 				"Access to '" + httpExchange.getRequestURI().getPath() + " for App '" + appName + "' granted.");
@@ -76,7 +75,7 @@ public abstract class AbstractEntityRestHandler<En> implements HttpHandler
 
 	protected RestAction getAction(RestHttpExchange exchange) throws RestException
 	{
-		RestAction action = RestActionFactory.createRestAction(getContext(), exchange.getEntityAction());
+		RestAction action = RestActionFactory.getRestAction(getContext(), exchange.getEntityAction());
 		ParametersProvider.setParameters(action, exchange);
 		return action;
 	}

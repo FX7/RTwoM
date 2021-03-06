@@ -5,13 +5,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
-
-import fx7.r2m.rest.RestException;
 
 @SerializableAs("AppAccess")
 public class AppAccess implements ConfigurationSerializable, Comparable<AppAccess>
@@ -44,29 +41,6 @@ public class AppAccess implements ConfigurationSerializable, Comparable<AppAcces
 		return appName;
 	}
 
-	private void checkAccess(Context context) throws RestException
-	{
-		if (context == null || !contexts.contains(context))
-			throw RestException.noContextAccess(context);
-	}
-
-	public void checkAccess(Context context, String entityName, String accessKey) throws RestException
-	{
-		checkAccess(new EntityAccess(context, entityName, accessKey));
-	}
-
-	public void checkAccess(EntityAccess entityAccess) throws RestException
-	{
-		if (entityAccess == null)
-			throw RestException.noEntityAccess(null, null);
-
-		checkAccess(entityAccess.getContext());
-
-		Optional<EntityAccess> access = this.entityAccess.stream().filter(e -> e.equals(entityAccess)).findFirst();
-		if (!access.isPresent())
-			throw RestException.noEntityAccess(entityAccess.getEntityName(), entityAccess.getContext());
-	}
-
 	public static AppAccess deserialize(Map<String, Object> serialized)
 	{
 		AppAccess access = new AppAccess(//
@@ -93,6 +67,11 @@ public class AppAccess implements ConfigurationSerializable, Comparable<AppAcces
 			return;
 
 		contexts.add(context);
+	}
+
+	public Set<EntityAccess> getEntityAccess()
+	{
+		return entityAccess;
 	}
 
 	@Override

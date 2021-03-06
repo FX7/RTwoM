@@ -12,7 +12,7 @@ import fx7.r2m.rest.handler.world.SetMaterialAction;
 
 public class RestActionFactory
 {
-	public static RestAction createRestAction(Context context, String entityAction) throws RestException
+	public static RestAction getRestAction(Context context, String entityAction) throws RestException
 	{
 		switch (context)
 		{

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -49,14 +50,9 @@ public class RequestPostParameters extends RequestParameters implements PlayerPa
 	private static final String PARAM_LOCATION = "location";
 	private ParameterList<LocationParameter> locationParameters;
 
-	private static final String PARAM_ACCESS = "entityAccess";
-	private static final Class<EntityAccess> PARAM_ACCESS_CLASS = EntityAccess.class;
-
-	private final Map<String, Object> parameters;
-
-	private RequestPostParameters(Map<String, Object> parameters)
+	private RequestPostParameters(Set<EntityAccess> entityAccess, Map<String, Object> parameters)
 	{
-		this.parameters = parameters;
+		super(entityAccess);
 		this.materialParameters = new ParameterList<>(parameters, PARAM_MATERIAL, PARAM_MATERIALS, String.class);
 		this.playerParameters = new ParameterList<>(parameters, PARAM_PLAYER, PARAM_PLAYERS, String.class);
 		this.itemStackParameters = new ParameterList<>(parameters, PARAM_ITEM_STACK, PARAM_ITEM_STACKS,
@@ -68,79 +64,74 @@ public class RequestPostParameters extends RequestParameters implements PlayerPa
 	@Override
 	public boolean hasMoreMaterial()
 	{
-		return materialParameters.hasNext();
+		return materialParameters.hasMore();
 	}
 
 	@Override
 	public Material peekMaterial() throws RestException
 	{
-		return MaterialParameterProvider.fromParameters(materialParameters.peekNext());
+		return MaterialParameterProvider.fromParameters(entityAccess, materialParameters.peek());
 	}
 
 	@Override
 	public Material consumeMaterial() throws RestException
 	{
-		return MaterialParameterProvider.fromParameters(materialParameters.getNext());
+		return MaterialParameterProvider.fromParameters(entityAccess, materialParameters.consume());
 	}
 
 	@Override
 	public boolean hasMorePlayer()
 	{
-		return playerParameters.hasNext();
+		return playerParameters.hasMore();
 	}
 
 	@Override
 	public OfflinePlayer peekPlayer() throws RestException
 	{
-		return PlayerParameterProvider.fromParameters(playerParameters.peekNext());
+		return PlayerParameterProvider.fromParameters(entityAccess, playerParameters.peek());
 	}
 
 	@Override
 	public OfflinePlayer consumePlayer() throws RestException
 	{
-		return PlayerParameterProvider.fromParameters(playerParameters.getNext());
+		return PlayerParameterProvider.fromParameters(entityAccess, playerParameters.consume());
 	}
 
 	@Override
 	public boolean hasMoreItemStack()
 	{
-		return this.itemStackParameters.hasNext();
+		return this.itemStackParameters.hasMore();
 	}
 
 	@Override
 	public ItemStack peekItemStack() throws RestException
 	{
-		return itemStackParameters.peekNext().toMinecraftParameter();
+		return itemStackParameters.peek().toMinecraftParameter(entityAccess);
 
 	}
 
 	@Override
 	public ItemStack consumeItemStack() throws RestException
 	{
-		return itemStackParameters.getNext().toMinecraftParameter();
+		return itemStackParameters.consume().toMinecraftParameter(entityAccess);
 	}
 
 	@Override
 	public boolean hasMoreLocation()
 	{
-		return locationParameters.hasNext();
+		return locationParameters.hasMore();
 	}
 
 	@Override
 	public Location peekLocation() throws RestException
 	{
-		return locationParameters.peekNext().toMinecraftParameter();
+		return locationParameters.peek().toMinecraftParameter(entityAccess);
 	}
 
 	@Override
 	public Location consumeLocation() throws RestException
 	{
-		return locationParameters.getNext().toMinecraftParameter();
-	}
-
-	public List<EntityAccess> getEntityAccess() throws RestException
-	{
-		return getList(PARAM_ACCESS, PARAM_ACCESS_CLASS, parameters.get(PARAM_ACCESS));
+		return locationParameters.consume().toMinecraftParameter(entityAccess);
 	}
 
 	private static <T> List<T> getList(String key, Class<T> clazz, Object value) throws RestException
@@ -201,7 +192,7 @@ public class RequestPostParameters extends RequestParameters implements PlayerPa
 		}
 	}
 
-	public static RequestPostParameters fromData(HttpExchange httpExchange)
+	public static RequestPostParameters fromData(Set<EntityAccess> entityAccess, HttpExchange httpExchange)
 	{
 		InputStream inputStream = httpExchange.getRequestBody();
 
@@ -222,7 +213,7 @@ public class RequestPostParameters extends RequestParameters implements PlayerPa
 		if (parameters == null)
 			parameters = new HashMap<>();
 
-		return new RequestPostParameters(parameters);
+		return new RequestPostParameters(entityAccess, parameters);
 	}
 
 	private static class ParameterList<T>
@@ -244,7 +235,7 @@ public class RequestPostParameters extends RequestParameters implements PlayerPa
 			this.clazz = clazz;
 		}
 
-		public boolean hasNext()
+		public boolean hasMore()
 		{
 			if (this.parameters == null)
 				this.parameters = buildParameters();
@@ -252,12 +243,12 @@ public class RequestPostParameters extends RequestParameters implements PlayerPa
 			return parameters.size() > 0;
 		}
 
-		public T peekNext() throws RestException
+		public T peek() throws RestException
 		{
 			return getNext(false);
 		}
 
-		public T getNext() throws RestException
+		public T consume() throws RestException
 		{
 			return getNext(true);
 		}
@@ -270,6 +261,7 @@ public class RequestPostParameters extends RequestParameters implements PlayerPa
 			if (parameters.isEmpty())
 				throw RestException
 						.invalidParameter("No (more) '" + singleParameter + "' / '" + arrayParameter + "' parameters");
+
 			if (consume)
 				return parameters.remove(0);
 			return parameters.get(0);
@@ -297,6 +289,7 @@ public class RequestPostParameters extends RequestParameters implements PlayerPa
 			{
 			}
 
+			// TODO maybe invert?
 			if (parameters == null)
 				parameters = new ArrayList<>();
 			return parameters;

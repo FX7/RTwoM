@@ -1,8 +1,11 @@
 package fx7.r2m.rest.parameter.location;
 
+import java.util.Set;
+
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import fx7.r2m.access.EntityAccess;
 import fx7.r2m.entity.WorldEntity;
 import fx7.r2m.rest.RestException;
 
@@ -14,9 +17,10 @@ public interface LocationParameterProvider
 
 	public Location consumeLocation() throws RestException;
 
-	public static Location fromParameters(String worldName, double x, double y, double z) throws RestException
+	public static Location fromParameters(Set<EntityAccess> entityAccess, String worldName, double x, double y,
+			double z) throws RestException
 	{
-		World world = WorldEntity.getWorld(worldName);
+		World world = WorldEntity.getWorld(entityAccess, worldName);
 		if (world == null)
 			throw RestException.invalidParameter("'" + worldName + "' is not a valid valid world");
 

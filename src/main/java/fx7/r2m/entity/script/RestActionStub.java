@@ -28,7 +28,7 @@ public class RestActionStub implements ConfigurationSerializable
 
 	public RestAction toRestAction() throws RestException
 	{
-		return RestActionFactory.createRestAction(context, action);
+		return RestActionFactory.getRestAction(context, action);
 	}
 
 	public static RestActionStub deserialize(Map<String, Object> serialized)

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import com.sun.net.httpserver.HttpExchange;
 
 import fx7.r2m.access.Context;
+import fx7.r2m.access.EntityAccess;
 import fx7.r2m.rest.RestException;
 import fx7.r2m.rest.parameter.location.LocationParameterProvider;
 import fx7.r2m.rest.parameter.material.MaterialParameterProvider;
@@ -36,8 +38,10 @@ public class RequestGetParameters extends RequestParameters
 	private final String entityId;
 	private final Map<String, List<String>> parameters;
 
-	private RequestGetParameters(Context context, String entityId, Map<String, List<String>> parameters)
+	private RequestGetParameters(Set<EntityAccess> entityAccess, Context context, String entityId,
+			Map<String, List<String>> parameters)
 	{
+		super(entityAccess);
 		this.context = context;
 		this.entityId = entityId;
 		this.parameters = parameters;
@@ -65,13 +69,14 @@ public class RequestGetParameters extends RequestParameters
 
 	private Location getNextLocation(boolean consume) throws RestException
 	{
-		String wordlName;
+		String worldName;
 		if (context == Context.WORLD && locationIndex == 0)
-			wordlName = getEntityId();
+			worldName = getEntityId();
 		else
-			wordlName = getString(PARAM_LOCATION_WORLD, locationIndex);
+			worldName = getString(PARAM_LOCATION_WORLD, locationIndex);
 
-		Location location = LocationParameterProvider.fromParameters(wordlName, //
+		Location location = LocationParameterProvider.fromParameters(entityAccess, //
+				worldName, //
 				getDouble(PARAM_LOCATION_X, locationIndex), //
 				getDouble(PARAM_LOCATION_Y, locationIndex), //
 				getDouble(PARAM_LOCATION_Z, locationIndex));
@@ -109,7 +114,7 @@ public class RequestGetParameters extends RequestParameters
 		else
 			playerName = getString(PARAM_PLAYER, playerIndex);
 
-		OfflinePlayer player = PlayerParameterProvider.fromParameters(playerName);
+		OfflinePlayer player = PlayerParameterProvider.fromParameters(entityAccess, playerName);
 
 		if (consume)
 			playerIndex++;
@@ -136,8 +141,8 @@ public class RequestGetParameters extends RequestParameters
 
 	private Material getNextMaterial(boolean consume) throws RestException
 	{
-		return MaterialParameterProvider
-				.fromParameters(getString(PARAM_MATERIAL, consume ? materialIndex++ : materialIndex));
+		return MaterialParameterProvider.fromParameters(entityAccess,
+				getString(PARAM_MATERIAL, consume ? materialIndex++ : materialIndex));
 	}
 
 	@Override
@@ -164,7 +169,8 @@ public class RequestGetParameters extends RequestParameters
 		return parameters.toString();
 	}
 
-	public static RequestGetParameters fromURI(Context context, String entityId, HttpExchange httpExchange)
+	public static RequestGetParameters fromURI(Set<EntityAccess> entityAccess, Context context, String entityId,
+			HttpExchange httpExchange)
 	{
 		Map<String, List<String>> requestParameters = new HashMap<>();
 		String[] split = httpExchange.getRequestURI().toString().split("\\?");
@@ -180,7 +186,7 @@ public class RequestGetParameters extends RequestParameters
 			}
 		}
 
-		return new RequestGetParameters(context, entityId, requestParameters);
+		return new RequestGetParameters(entityAccess, context, entityId, requestParameters);
 	}
 
 	private List<String> getAll(String key)
@@ -233,5 +239,4 @@ public class RequestGetParameters extends RequestParameters
 		}
 		parameters.add(value);
 	}
-
 }
