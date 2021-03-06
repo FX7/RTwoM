@@ -1,0 +1,13 @@
+scripts:
+- ==: ScriptEntity
+  name: rewardChest
+  actions:
+  - ==: RestActionStub
+    context: PLAYER
+    action: getLastLocation
+  - ==: RestActionStub
+    context: WORLD
+    action: setMaterial
+  - ==: RestActionStub
+    context: WORLD
+    action: addToContainer

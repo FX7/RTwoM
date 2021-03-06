@@ -1,0 +1,29 @@
+appAccess:
+- ==: AppAccess
+  appName: yourAppName
+  appKey: 1234-abcd
+  contexts:
+  - WORLD
+  - PLAYER
+  - SCRIPT
+  entityAccess:
+  - ==: EntityAccess
+    entityName: steve
+    context: PLAYER
+  - ==: EntityAccess
+    entityName: world
+    context: WORLD
+  - ==: EntityAccess
+    entityName: world_nether
+    context: WORLD
+  - ==: EntityAccess
+    entityName: world_the_end
+    context: WORLD
+  - ==: EntityAccess
+    entityName: rewardChest
+    context: SCRIPT
+restServerConfig:
+  ==: RestServerConfig
+  backlog: 0
+  port: 8080
+  host: localhost
