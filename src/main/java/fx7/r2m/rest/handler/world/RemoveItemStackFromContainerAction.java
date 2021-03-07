@@ -19,13 +19,13 @@ import fx7.r2m.rest.parameter.location.LocationParameterProvider;
 import fx7.r2m.rest.parameter.location.LocationParameterReceiver;
 import fx7.r2m.rest.server.RequestMethod;
 
-public class AddItemStackToContainerAction extends RestAction
+public class RemoveItemStackFromContainerAction extends RestAction
 		implements LocationParameterReceiver, ItemStackParameterReceiver
 {
 	private LocationParameterProvider locationParameter;
 	private ItemStackParameterProvider itemStackParameter;
 
-	public AddItemStackToContainerAction(String actionName)
+	public RemoveItemStackFromContainerAction(String actionName)
 	{
 		super(Context.WORLD, RequestMethod.POST, actionName);
 	}
@@ -42,9 +42,9 @@ public class AddItemStackToContainerAction extends RestAction
 		Location location = locationParameter.peekLocation();
 		ItemStack itemStack = itemStackParameter.peekItemStack();
 
-		// TODO handle unadded Items
-		Map<Integer, ItemStack> unAddedItems = coordinator
-				.callSyncMethod(() -> addItemStackToContainer(location, itemStack));
+		// TODO handle unremoved Items
+		Map<Integer, ItemStack> unRemovedItems = coordinator
+				.callSyncMethod(() -> removeItemStackFromContainer(location, itemStack));
 		return RestReturnable.simpleOK();
 	}
 
@@ -60,21 +60,22 @@ public class AddItemStackToContainerAction extends RestAction
 		this.itemStackParameter = parameter;
 	}
 
-	private Map<Integer, ItemStack> addItemStackToContainer(Location location, ItemStack itemStack) throws RestException
+	private Map<Integer, ItemStack> removeItemStackFromContainer(Location location, ItemStack itemStack)
+			throws RestException
 	{
-		Map<Integer, ItemStack> unaddedItems = new HashMap<>();
+		Map<Integer, ItemStack> unremovedItems = new HashMap<>();
 		Block block = location.getBlock();
 		BlockState state = block.getState();
 		if (state instanceof Container)
 		{
 			Container chest = (Container) state;
-			unaddedItems = chest.getSnapshotInventory().addItem(itemStack);
+			unremovedItems = chest.getSnapshotInventory().removeItem(itemStack);
 			boolean update = chest.update(true);
 			if (!update)
 				throw RestException.blockUpdateFailed(location);
 		} else
 			throw RestException.invalidParameter("Block at given location is no Container!");
 
-		return unaddedItems;
+		return unremovedItems;
 	}
 }

@@ -26,9 +26,6 @@ public class GetMaterialAction extends RestAction implements LocationParameterRe
 	@Override
 	public RestReturnable excecute() throws RestException
 	{
-		if (locationParameter == null)
-			throw RestException.invalidParameter("LocationParameter missing.");
-
 		return RestReturnable.plainTextOK((peekMaterial()).name());
 	}
 

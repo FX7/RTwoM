@@ -7,7 +7,9 @@ import fx7.r2m.rest.handler.player.GetLastLocationAction;
 import fx7.r2m.rest.handler.player.GetLastPlayedAction;
 import fx7.r2m.rest.handler.script.ExecuteAction;
 import fx7.r2m.rest.handler.world.AddItemStackToContainerAction;
+import fx7.r2m.rest.handler.world.GetInventoryFromContainerAction;
 import fx7.r2m.rest.handler.world.GetMaterialAction;
+import fx7.r2m.rest.handler.world.RemoveItemStackFromContainerAction;
 import fx7.r2m.rest.handler.world.SetMaterialAction;
 
 public class RestActionFactory
@@ -33,6 +35,8 @@ public class RestActionFactory
 			return new GetLastPlayedAction(action);
 		else if ("getLastLocation".equals(action))
 			return new GetLastLocationAction(action);
+//		else if ("getLastDirection".equals(action))
+//			return new GetLastDirectionAction(action);
 		throw RestException.unknownAction(action, Context.PLAYER);
 	}
 
@@ -44,6 +48,10 @@ public class RestActionFactory
 			return new SetMaterialAction(action);
 		else if ("addToContainer".equals(action))
 			return new AddItemStackToContainerAction(action);
+		else if ("removeFromContainer".equals(action))
+			return new RemoveItemStackFromContainerAction(action);
+		else if ("getInventory".equals(action))
+			return new GetInventoryFromContainerAction(action);
 		throw RestException.unknownAction(action, Context.WORLD);
 	}
 
