@@ -11,7 +11,7 @@ import fx7.r2m.rest.parameter.itemstack.ItemStackParameter;
 
 public class InventoryParameter implements RestParameter
 {
-	private final List<ItemStackParameter> itemStacks = new ArrayList<>();
+	private final List<ItemStackParameter> inventory = new ArrayList<>();
 
 	public InventoryParameter()
 	{
@@ -21,7 +21,7 @@ public class InventoryParameter implements RestParameter
 	{
 		ItemStackParameter itemStackParameter = ItemStackParameter.fromItemStack(itemStack);
 		if (itemStackParameter != null)
-			this.itemStacks.add(itemStackParameter);
+			this.inventory.add(itemStackParameter);
 	}
 
 	public static InventoryParameter fromInventory(Inventory inventory)

@@ -14,6 +14,7 @@ import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.google.gson.Gson;
@@ -114,6 +115,24 @@ public class RequestPostParameters extends RequestParameters implements PlayerPa
 	public ItemStack consumeItemStack() throws RestException
 	{
 		return itemStackParameters.consume().toMinecraftParameter(entityAccess);
+	}
+
+	@Override
+	public boolean hasMoreInventory()
+	{
+		return false;
+	}
+
+	@Override
+	public Inventory peekInventory() throws RestException
+	{
+		throw RestException.invalidParameter("No ItemInventoryParameter");
+	}
+
+	@Override
+	public Inventory consumeInventory() throws RestException
+	{
+		throw RestException.invalidParameter("No ItemInventoryParameter");
 	}
 
 	@Override

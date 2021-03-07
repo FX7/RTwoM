@@ -1,7 +1,7 @@
 package fx7.r2m.rest.handler.script;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -9,6 +9,7 @@ import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import fx7.r2m.access.Context;
@@ -21,6 +22,7 @@ import fx7.r2m.rest.RestReturnable;
 import fx7.r2m.rest.parameter.ParameterProvider;
 import fx7.r2m.rest.parameter.ParametersProvider;
 import fx7.r2m.rest.parameter.ParametersReceiver;
+import fx7.r2m.rest.parameter.inventory.InventoryParameterProvider;
 import fx7.r2m.rest.parameter.itemstack.ItemStackParameterProvider;
 import fx7.r2m.rest.parameter.location.LocationParameterProvider;
 import fx7.r2m.rest.parameter.material.MaterialParameterProvider;
@@ -32,6 +34,8 @@ public class ExecuteAction extends RestAction implements ParametersProvider, Par
 	private ScriptEntity script;
 
 	private ParameterList<ItemStack> itemStackParameters = new ParameterList<>();
+
+	private ParameterList<Inventory> inventoryParameters = new ParameterList<>();
 
 	private ParameterList<Location> locationParameters = new ParameterList<>();
 
@@ -47,7 +51,7 @@ public class ExecuteAction extends RestAction implements ParametersProvider, Par
 	@Override
 	public RestReturnable excecute() throws RestException
 	{
-		Map<String, RestJsonReturnable> resultMap = new HashMap<>();
+		Map<String, RestJsonReturnable> resultMap = new LinkedHashMap<>();
 		for (RestAction ra : script.getRestActions())
 		{
 			ParametersProvider.setParameters(ra, this);
@@ -117,6 +121,50 @@ public class ExecuteAction extends RestAction implements ParametersProvider, Par
 	public ItemStack consumeItemStack() throws RestException
 	{
 		return this.itemStackParameters.consume();
+	}
+
+	@Override
+	public void setInventoryParameter(InventoryParameterProvider parameter)
+	{
+		this.inventoryParameters.addParameters(new ParameterProvider<Inventory>()
+		{
+
+			@Override
+			public boolean hasMore()
+			{
+				return parameter.hasMoreInventory();
+			}
+
+			@Override
+			public Inventory peek() throws RestException
+			{
+				return parameter.peekInventory();
+			}
+
+			@Override
+			public Inventory consume() throws RestException
+			{
+				return parameter.consumeInventory();
+			}
+		});
+	}
+
+	@Override
+	public boolean hasMoreInventory()
+	{
+		return inventoryParameters.hasMore();
+	}
+
+	@Override
+	public Inventory peekInventory() throws RestException
+	{
+		return inventoryParameters.peek();
+	}
+
+	@Override
+	public Inventory consumeInventory() throws RestException
+	{
+		return inventoryParameters.consume();
 	}
 
 	@Override

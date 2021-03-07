@@ -22,24 +22,6 @@ public interface RestJsonReturnable extends RestReturnable
 		if (returnable instanceof RestJsonReturnable)
 			return (RestJsonReturnable) returnable;
 
-		RestJsonReturnable result = new RestJsonReturnable()
-		{
-			@Override
-			public byte[] getHttpResponseMessage()
-			{
-				String message = "";
-				if (returnable.getHttpResponseMessage() != null)
-					message = new String(returnable.getHttpResponseMessage());
-				message = "{'message':'" + message + "','httpStatusCode':'" + getHttpStatusCode() + "'}";
-				return message.getBytes();
-			}
-
-			@Override
-			public int getHttpStatusCode()
-			{
-				return returnable.getHttpStatusCode();
-			}
-		};
-		return result;
+		return new JsonableRestReturnable(returnable);
 	}
 }

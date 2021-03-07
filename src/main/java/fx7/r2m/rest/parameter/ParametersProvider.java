@@ -1,6 +1,8 @@
 package fx7.r2m.rest.parameter;
 
 import fx7.r2m.rest.RestAction;
+import fx7.r2m.rest.parameter.inventory.InventoryParameterProvider;
+import fx7.r2m.rest.parameter.inventory.InventoryParameterReceiver;
 import fx7.r2m.rest.parameter.itemstack.ItemStackParameterProvider;
 import fx7.r2m.rest.parameter.itemstack.ItemStackParameterReceiver;
 import fx7.r2m.rest.parameter.location.LocationParameterProvider;
@@ -11,7 +13,7 @@ import fx7.r2m.rest.parameter.player.PlayerParameterProvider;
 import fx7.r2m.rest.parameter.player.PlayerParameterReceiver;
 
 public interface ParametersProvider extends ItemStackParameterProvider, LocationParameterProvider,
-		MaterialParameterProvider, PlayerParameterProvider
+		MaterialParameterProvider, PlayerParameterProvider, InventoryParameterProvider
 {
 	public static void setParameters(RestAction action, ParametersProvider provider)
 	{
@@ -23,5 +25,7 @@ public interface ParametersProvider extends ItemStackParameterProvider, Location
 			((MaterialParameterReceiver) action).setMaterialParameter(provider);
 		if (action instanceof PlayerParameterReceiver)
 			((PlayerParameterReceiver) action).setPlayerParameter(provider);
+		if (action instanceof InventoryParameterReceiver)
+			((InventoryParameterReceiver) action).setInventoryParameter(provider);
 	}
 }

@@ -6,6 +6,7 @@ import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.sun.net.httpserver.HttpExchange;
@@ -60,6 +61,28 @@ public class RestHttpExchange implements ParametersProvider
 		if (getGetParameters().hasMoreItemStack())
 			return getGetParameters().consumeItemStack();
 		return getPostParameters().consumeItemStack();
+	}
+
+	@Override
+	public boolean hasMoreInventory()
+	{
+		return getGetParameters().hasMoreInventory() || getPostParameters().hasMoreInventory();
+	}
+
+	@Override
+	public Inventory peekInventory() throws RestException
+	{
+		if (getGetParameters().hasMoreInventory())
+			return getGetParameters().peekInventory();
+		return getPostParameters().peekInventory();
+	}
+
+	@Override
+	public Inventory consumeInventory() throws RestException
+	{
+		if (getGetParameters().hasMoreInventory())
+			return getGetParameters().consumeInventory();
+		return getPostParameters().consumeInventory();
 	}
 
 	@Override
