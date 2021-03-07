@@ -10,7 +10,7 @@ For example you can get the last location of player *steve* via the simple curl 
 
 ## Features
 
-I didnt find a plugin which offers the ability to make REST calls against the Bukkit API, but even if there is such plugin out there, RTwoM has tow very interesting unique features:
+I didnt find a plugin which offers the ability to make REST calls against the Bukkit API, but even if there is such plugin out there, RTwoM has two very interesting unique features:
 
 * access control : Not only the app itself must have a valid access token, it is also possible to define which world the app can access and which player. In the future it may be possible to differ between read (eg getLocation) and write (eg setLocation) access and maybe also define coordinates for world access.
 * atomic access and scripting : Each single REST call will try to be as small in its function as possible. Single Bukkit API methods should be represented in a single REST call. That said you may think this will lead to a havy traffic while applying complex actions. But therefore this plugin offers the possibility to define scripts. With a script you can define a bunch of single REST calls, which will be then be accessable to one new REST call.
