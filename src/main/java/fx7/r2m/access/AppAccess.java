@@ -47,11 +47,13 @@ public class AppAccess implements ConfigurationSerializable, Comparable<AppAcces
 				(String) serialized.get(PARAM_APP_NAME), //
 				(String) serialized.get(PARAM_APP_KEY));
 
+		@SuppressWarnings("unchecked")
 		List<EntityAccess> entityAccess = (List<EntityAccess>) serialized.get(PARAM_ENTITY_ACCESS);
 		if (entityAccess == null)
 			entityAccess = new ArrayList<>();
 		access.entityAccess.addAll(entityAccess);
 
+		@SuppressWarnings("unchecked")
 		List<String> contexts = (List<String>) serialized.get(PARAM_CONTEXTS);
 		if (contexts == null)
 			contexts = new ArrayList<>();

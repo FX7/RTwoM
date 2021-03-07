@@ -68,7 +68,10 @@ public class LocationParameter implements RestParameter, MinecraftParameter<Loca
 
 			// TODO Exception
 			CompoundTag tag = (CompoundTag) playerFile.getTag();
-			World world = getWorldFromDimensionTag((Tag<String>) tag.get("Dimension"));
+			@SuppressWarnings("unchecked")
+			Tag<String> dimension = (Tag<String>) tag.get("Dimension");
+			World world = getWorldFromDimensionTag(dimension);
+			@SuppressWarnings("unchecked")
 			ListTag<DoubleTag> pos = (ListTag<DoubleTag>) tag.get("Pos");
 			double x = pos.get(0).asDouble();
 			double y = pos.get(1).asDouble();
