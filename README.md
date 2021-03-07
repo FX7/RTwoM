@@ -6,7 +6,7 @@ This is a Spigot/Paper plugin, which will offer access to the Bukkit API via RES
 
 For example you can get the last location of player *steve* via the simple curl call:
 
-*curl -H "App-Name: testApp" -H "App-Key: 1234-abcd" X GET "http://localhost:8080/rest/v1/player/steve/getLastLocation"*
+*curl -H "App-Name: testApp" -H "App-Key: 1234-abcd" -X GET "http://localhost:8080/rest/v1/player/steve/getLastLocation"*
 
 ## Features
 
