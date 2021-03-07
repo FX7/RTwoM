@@ -50,5 +50,15 @@ There is also one example script in the *scripts.yml*. The sript is called "rewa
 ### curl calls
 
 curl -v -H "App-Name: testApp" -H "App-Key: 1234-abcd" -X GET "http://localhost:8080/rest/v1/player/steve/getLastLocation"
+
+curl -v -H "App-Name: testApp" -H "App-Key: 1234-abcd" -H "Entity-Key: xyz-987" -X POST "http://localhost:8080/rest/v1/world/world/setMaterial?x=-130&y=72&z=202" --data "{'material':'CHEST'}"
+
+curl -v -H "App-Name: testApp" -H "App-Key: 1234-abcd" -X POST "http://localhost:8080/rest/v1/world/world/addToContainer?x=-130&y=72&z=202" --data "{'itemStack':{'material':'DIAMOND','amount':'64'}}"
+
+curl -v -H "App-Name: testApp" -H "App-Key: 1234-abcd" -X POST "http://localhost:8080/rest/v1/world/world/removeFromContainer?x=-130&y=72&z=202" --data "{'itemStack':{'material':'DIAMOND','amount':'63'}}"
+
+curl -v -H "App-Name: testApp" -H "App-Key: 1234-abcd" -X GET "http://localhost:8080/rest/v1/world/world/getInventory?x=-130&y=72&z=202"
+
 curl -v -H "App-Name: testApp" -H "App-Key: 1234-abcd" -X GET "http://localhost:8080/rest/v1/player/steve/getLastPlayed"
+
 curl -v -H "App-Name: testApp" -H "App-Key: 1234-abcd" -X POST "http://localhost:8080/rest/v1/script/rewardChest/execute" --data "{'player':'steve','material':'CHEST','itemStack':{'material':'DIAMOND','amount':'64'}}"
