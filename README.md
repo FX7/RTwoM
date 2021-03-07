@@ -21,7 +21,7 @@ A friend of mine had the idea to provide a Andorid app, which would interact wit
 
 ## Status quo
 
-The plugin is in very early pre alpha state ;-) So there is a basic access control, few atomic REST calls an on example script.
+The plugin is in very early pre alpha state ;-) So there is a basic access control, few atomic REST calls and on example script.
 
 ## Way ahead
 
