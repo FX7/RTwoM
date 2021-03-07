@@ -300,27 +300,16 @@ public class ExecuteAction extends RestAction implements ParametersProvider, Par
 
 	private static class ParameterList<T>
 	{
-		private int index = -1;
-		private List<T> parameters = new ArrayList<>();
+		private List<ParameterProvider<T>> providers = new ArrayList<>();
 
 		public void addParameters(ParameterProvider<T> provider)
 		{
-			while (provider.hasMore())
-			{
-				try
-				{
-					this.parameters.add(provider.consume());
-				} catch (RestException e)
-				{
-					// TODO Exception Handling
-				}
-			}
-			index = this.parameters.size() - 1;
+			providers.add(provider);
 		}
 
 		public boolean hasMore()
 		{
-			return index >= 0;
+			return providers.stream().anyMatch(p -> p.hasMore());
 		}
 
 		public T peek() throws RestException
@@ -333,20 +322,22 @@ public class ExecuteAction extends RestAction implements ParametersProvider, Par
 			return getNext(true);
 		}
 
-		private T getNext(boolean shift) throws RestException
+		private T getNext(boolean consume) throws RestException
 		{
-			if (!hasMore())
+			ParameterProvider<T> next = null;
+			for (int i = 0; i < providers.size() && next == null; i++)
+			{
+				ParameterProvider<T> provider = providers.get(i);
+				if (provider.hasMore())
+					next = provider;
+			}
+
+			if (next == null)
 				throw RestException.invalidParameter("No (more) Parameters");
 
-			T result = parameters.get(index);
-
-			if (shift)
-			{
-				index--;
-				if (index < 0)
-					index = parameters.size() - 1;
-			}
-			return result;
+			if (consume)
+				return next.consume();
+			return next.peek();
 		}
 	}
 }
