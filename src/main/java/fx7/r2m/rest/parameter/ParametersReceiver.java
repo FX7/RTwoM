@@ -11,9 +11,11 @@ import fx7.r2m.rest.parameter.material.MaterialParameterProvider;
 import fx7.r2m.rest.parameter.material.MaterialParameterReceiver;
 import fx7.r2m.rest.parameter.player.PlayerParameterProvider;
 import fx7.r2m.rest.parameter.player.PlayerParameterReceiver;
+import fx7.r2m.rest.parameter.powerable.PowerParameterProvider;
+import fx7.r2m.rest.parameter.powerable.PowerParameterReceiver;
 
 public interface ParametersReceiver extends ItemStackParameterReceiver, LocationParameterReceiver,
-		MaterialParameterReceiver, PlayerParameterReceiver, InventoryParameterReceiver
+		MaterialParameterReceiver, PlayerParameterReceiver, InventoryParameterReceiver, PowerParameterReceiver
 {
 	public static void extractParameters(RestAction action, ParametersReceiver receiver)
 	{
@@ -27,5 +29,7 @@ public interface ParametersReceiver extends ItemStackParameterReceiver, Location
 			receiver.setPlayerParameter((PlayerParameterProvider) action);
 		if (action instanceof InventoryParameterProvider)
 			receiver.setInventoryParameter((InventoryParameterProvider) action);
+		if (action instanceof PowerParameterProvider)
+			receiver.setPowerParameter((PowerParameterProvider) action);
 	}
 }

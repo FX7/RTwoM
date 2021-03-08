@@ -51,6 +51,10 @@ public class RequestPostParameters extends RequestParameters implements PlayerPa
 	private static final String PARAM_LOCATION = "location";
 	private ParameterList<LocationParameter> locationParameters;
 
+	private static final String PARAM_POWERS = "powers";
+	private static final String PARAM_POWER = "power";
+	private ParameterList<Boolean> powerParameters;
+
 	private RequestPostParameters(Set<EntityAccess> entityAccess, Map<String, Object> parameters)
 	{
 		super(entityAccess);
@@ -60,6 +64,7 @@ public class RequestPostParameters extends RequestParameters implements PlayerPa
 				ItemStackParameter.class);
 		this.locationParameters = new ParameterList<>(parameters, PARAM_LOCATION, PARAM_LOCATIONS,
 				LocationParameter.class);
+		this.powerParameters = new ParameterList<>(parameters, PARAM_POWER, PARAM_POWERS, Boolean.class);
 	}
 
 	@Override
@@ -151,6 +156,24 @@ public class RequestPostParameters extends RequestParameters implements PlayerPa
 	public Location consumeLocation() throws RestException
 	{
 		return locationParameters.consume().toMinecraftParameter(entityAccess);
+	}
+
+	@Override
+	public boolean hasMorePower()
+	{
+		return powerParameters.hasMore();
+	}
+
+	@Override
+	public boolean peekPower() throws RestException
+	{
+		return powerParameters.peek();
+	}
+
+	@Override
+	public boolean consumePower() throws RestException
+	{
+		return powerParameters.consume();
 	}
 
 	private static <T> List<T> getList(String key, Class<T> clazz, Object value) throws RestException

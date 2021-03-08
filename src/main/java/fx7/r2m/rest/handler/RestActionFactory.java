@@ -10,6 +10,7 @@ import fx7.r2m.rest.handler.world.AddItemStackToContainerAction;
 import fx7.r2m.rest.handler.world.GetInventoryFromContainerAction;
 import fx7.r2m.rest.handler.world.GetMaterialAction;
 import fx7.r2m.rest.handler.world.RemoveItemStackFromContainerAction;
+import fx7.r2m.rest.handler.world.SetLeverPower;
 import fx7.r2m.rest.handler.world.SetMaterialAction;
 
 public class RestActionFactory
@@ -52,6 +53,8 @@ public class RestActionFactory
 			return new RemoveItemStackFromContainerAction(action);
 		else if ("getInventory".equals(action))
 			return new GetInventoryFromContainerAction(action);
+		else if ("setLeverPower".equals(action))
+			return new SetLeverPower(action);
 		throw RestException.unknownAction(action, Context.WORLD);
 	}
 

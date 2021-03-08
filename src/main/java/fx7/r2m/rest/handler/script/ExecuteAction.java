@@ -27,6 +27,7 @@ import fx7.r2m.rest.parameter.itemstack.ItemStackParameterProvider;
 import fx7.r2m.rest.parameter.location.LocationParameterProvider;
 import fx7.r2m.rest.parameter.material.MaterialParameterProvider;
 import fx7.r2m.rest.parameter.player.PlayerParameterProvider;
+import fx7.r2m.rest.parameter.powerable.PowerParameterProvider;
 import fx7.r2m.rest.server.RequestMethod;
 
 public class ExecuteAction extends RestAction implements ParametersProvider, ParametersReceiver
@@ -42,6 +43,8 @@ public class ExecuteAction extends RestAction implements ParametersProvider, Par
 	private ParameterList<Material> materialParameters = new ParameterList<>();
 
 	private ParameterList<OfflinePlayer> playerParameters = new ParameterList<>();
+
+	private ParameterList<Boolean> powerParameters = new ParameterList<>();
 
 	public ExecuteAction(String actionName)
 	{
@@ -165,6 +168,50 @@ public class ExecuteAction extends RestAction implements ParametersProvider, Par
 	public Inventory consumeInventory() throws RestException
 	{
 		return inventoryParameters.consume();
+	}
+
+	@Override
+	public boolean hasMorePower()
+	{
+		return powerParameters.hasMore();
+	}
+
+	@Override
+	public boolean peekPower() throws RestException
+	{
+		return powerParameters.peek();
+	}
+
+	@Override
+	public boolean consumePower() throws RestException
+	{
+		return powerParameters.consume();
+	}
+
+	@Override
+	public void setPowerParameter(PowerParameterProvider parameter)
+	{
+		this.powerParameters.addParameters(new ParameterProvider<Boolean>()
+		{
+
+			@Override
+			public boolean hasMore()
+			{
+				return parameter.hasMorePower();
+			}
+
+			@Override
+			public Boolean peek() throws RestException
+			{
+				return parameter.peekPower();
+			}
+
+			@Override
+			public Boolean consume() throws RestException
+			{
+				return parameter.consumePower();
+			}
+		});
 	}
 
 	@Override

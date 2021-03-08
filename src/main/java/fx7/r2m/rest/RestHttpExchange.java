@@ -151,6 +151,28 @@ public class RestHttpExchange implements ParametersProvider
 		return getPostParameters().consumeLocation();
 	}
 
+	@Override
+	public boolean hasMorePower()
+	{
+		return getGetParameters().hasMorePower() || getPostParameters().hasMorePower();
+	}
+
+	@Override
+	public boolean peekPower() throws RestException
+	{
+		if (getGetParameters().hasMorePower())
+			return getGetParameters().peekPower();
+		return getPostParameters().peekPower();
+	}
+
+	@Override
+	public boolean consumePower() throws RestException
+	{
+		if (getGetParameters().hasMorePower())
+			return getGetParameters().consumePower();
+		return getPostParameters().consumePower();
+	}
+
 	private RequestGetParameters getGetParameters()
 	{
 		if (getParameters != null)

@@ -62,3 +62,5 @@ curl -v -H "App-Name: testApp" -H "App-Key: 1234-abcd" -X GET "http://localhost:
 curl -v -H "App-Name: testApp" -H "App-Key: 1234-abcd" -X GET "http://localhost:8080/rest/v1/player/steve/getLastPlayed"
 
 curl -v -H "App-Name: testApp" -H "App-Key: 1234-abcd" -X POST "http://localhost:8080/rest/v1/script/rewardChest/execute" --data "{'player':'steve','material':'CHEST','itemStack':{'material':'DIAMOND','amount':'64'}}"
+
+curl -v -H "App-Name: testApp" -H "App-Key: 1234-abcd" -X POST "http://localhost:8080/rest/v1/world/world/setLeverPower?x=-125&y=71&z=211" --data "{'power':true}"

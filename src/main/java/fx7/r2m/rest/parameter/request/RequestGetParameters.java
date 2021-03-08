@@ -183,6 +183,24 @@ public class RequestGetParameters extends RequestParameters
 	}
 
 	@Override
+	public boolean hasMorePower()
+	{
+		return false;
+	}
+
+	@Override
+	public boolean peekPower() throws RestException
+	{
+		throw RestException.invalidParameter("No PowertParameter");
+	}
+
+	@Override
+	public boolean consumePower() throws RestException
+	{
+		throw RestException.invalidParameter("No PowertParameter");
+	}
+
+	@Override
 	public String toString()
 	{
 		return parameters.toString();
