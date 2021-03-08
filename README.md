@@ -51,7 +51,7 @@ There is also one example script in the *scripts.yml*. The sript is called "rewa
 
 curl -v -H "App-Name: testApp" -H "App-Key: 1234-abcd" -X GET "http://localhost:8080/rest/v1/player/steve/getLastLocation"
 
-curl -v -H "App-Name: testApp" -H "App-Key: 1234-abcd" -H "Entity-Key: xyz-987" -X POST "http://localhost:8080/rest/v1/world/world/setMaterial?x=-130&y=72&z=202" --data "{'material':'CHEST'}"
+curl -v -H "App-Name: testApp" -H "App-Key: 1234-abcd" -X POST "http://localhost:8080/rest/v1/world/world/setMaterial?x=-130&y=72&z=202" --data "{'material':'CHEST'}"
 
 curl -v -H "App-Name: testApp" -H "App-Key: 1234-abcd" -X POST "http://localhost:8080/rest/v1/world/world/addToContainer?x=-130&y=72&z=202" --data "{'itemStack':{'material':'DIAMOND','amount':'64'}}"
 
